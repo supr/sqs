@@ -40,6 +40,11 @@ type CreateQueueResponse struct {
 	ResponseMetadata
 }
 
+type ListQueuesResponse struct {
+	QueueUrl []string `xml:"ListQueuesResult>QueueUrl"`
+	ResponseMetadata
+}
+
 type ResponseMetadata struct {
 	RequestId string
 	BoxUsage  float64
@@ -81,18 +86,44 @@ func (s *SQS) newQueue(queueName string, timeout int) (resp *CreateQueueResponse
 	params["QueueName"] = queueName
 	params["DefaultVisibilityTimeout"] = strconv.Itoa(timeout)
 
-	err = s.query(params, resp)
+	err = s.query("", params, resp)
 	return
 }
 
-func (s *SQS) query(params map[string]string, resp interface{}) os.Error {
+func (s *SQS) ListQueues(QueueNamePrefix string) (resp *ListQueuesResponse, err os.Error) {
+	resp = &ListQueuesResponse{}
+	params := makeParams("ListQueues")
+
+	if QueueNamePrefix != "" {
+		params["QueueNamePrefix"] = QueueNamePrefix
+	}
+
+	err = s.query("", params, resp)
+	return
+}
+
+func (s *SQS) query(queueUrl string, params map[string]string, resp interface{}) os.Error {
 	params["Timestamp"] = time.UTC().Format(time.RFC3339)
-	url_, err := url.Parse(s.Region.SQSEndpoint)
+	var url_ *url.URL
+	var err os.Error
+	var path string
+	if queueUrl != "" {
+		url_, err = url.Parse(queueUrl)
+		path = "/" + queueUrl[len(s.Region.SQSEndpoint):]
+	} else {
+		url_, err = url.Parse(s.Region.SQSEndpoint)
+		path = "/"
+	}
 	if err != nil {
 		return err
 	}
 
-	sign(s.Auth, "GET", "/", params, url_.Host)
+	//url_, err := url.Parse(s.Region.SQSEndpoint)
+	//if err != nil {
+	//	return err
+	//}
+
+	sign(s.Auth, "GET", path, params, url_.Host)
 	url_.RawQuery = multimap(params).Encode()
 	r, err := http.Get(url_.String())
 	if err != nil {
