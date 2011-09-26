@@ -30,6 +30,11 @@ func New(auth aws.Auth, region aws.Region) *SQS {
 	return &SQS{auth, region, 0}
 }
 
+type Queue struct {
+	*SQS
+	Url string
+}
+
 type CreateQueueResponse struct {
 	QueueUrl string `xml:"CreateQueueResult>QueueUrl"`
 	ResponseMetadata
@@ -56,12 +61,20 @@ type xmlErrors struct {
 	Errors    []Error `xml:"Errors>Error"`
 }
 
-func (s *SQS) CreateQueue(queueName string) (resp *CreateQueueResponse, err os.Error) {
-	resp, err = s.CreateQueueWithTimeout(queueName, 30)
+func (s *SQS) CreateQueue(queueName string) (*Queue, os.Error) {
+	return s.CreateQueueWithTimeout(queueName, 30)
+}
+
+func (s *SQS) CreateQueueWithTimeout(queueName string, timeout int) (q *Queue, err os.Error) {
+	resp, err := s.newQueue(queueName, timeout)
+	if err != nil {
+		return nil, err
+	}
+	q = &Queue{s, resp.QueueUrl}
 	return
 }
 
-func (s *SQS) CreateQueueWithTimeout(queueName string, timeout int) (resp *CreateQueueResponse, err os.Error) {
+func (s *SQS) newQueue(queueName string, timeout int) (resp *CreateQueueResponse, err os.Error) {
 	resp = &CreateQueueResponse{}
 	params := makeParams("CreateQueue")
 

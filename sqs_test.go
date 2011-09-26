@@ -29,7 +29,6 @@ func (s *S) TestCreateQueue(c *gocheck.C) {
     c.Assert(req.URL.Path, gocheck.Equals, "/")
     c.Assert(req.Header["Date"], gocheck.Not(gocheck.Equals), "")
 
-    c.Assert(resp.QueueUrl, gocheck.Equals, "http://sqs.us-east-1.amazonaws.com/123456789012/testQueue")
-    c.Assert(resp.ResponseMetadata.RequestId, gocheck.Equals, "7a62c49f-347e-4fc4-9331-6e8e7a96aa73")
+    c.Assert(resp.Url, gocheck.Equals, "http://sqs.us-east-1.amazonaws.com/123456789012/testQueue")
     c.Assert(err, gocheck.IsNil)
 }
