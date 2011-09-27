@@ -101,6 +101,7 @@ func (s *S) TestReceiveMessage(c *gocheck.C) {
 	c.Assert(resp.Messages[0].MessageId, gocheck.Equals, "5fea7756-0ea4-451a-a703-a558b933e274")
 	c.Assert(resp.Messages[0].MD5OfBody, gocheck.Equals, "fafb00f5732ab283681e124bf8747ed1")
 	c.Assert(resp.Messages[0].ReceiptHandle, gocheck.Equals, "MbZj6wDWli+JvwwJaBV+3dcjk2YW2vA3+STFFljTM8tJJg6HRG6PYSasuWXPJB+CwLj1FjgXUv1uSj1gUPAWV66FU/WeR4mq2OKpEGYWbnLmpRCJVAyeMjeU5ZBdtcQ+QEauMZc8ZRv37sIW2iJKq3M9MFx1YvV11A2x/KSbkJ0=")
+	c.Assert(resp.Messages[0].Body, gocheck.Equals, "This is a test message")
 	c.Assert(len(resp.Messages[0].Attribute), gocheck.Not(gocheck.Equals), 0)
 	c.Assert(err, gocheck.IsNil)
 }

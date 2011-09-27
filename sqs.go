@@ -62,6 +62,7 @@ type ReceiveMessageResponse struct {
 
 type Message struct {
 	MessageId     string      `xml:"MessageId"`
+	Body          string      `xml:"Body"`
 	MD5OfBody     string      `xml:"MD5OfBody"`
 	ReceiptHandle string      `xml:"ReceiptHandle"`
 	Attribute     []Attribute `xml:"Attribute"`
