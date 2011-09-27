@@ -45,6 +45,10 @@ type ListQueuesResponse struct {
 	ResponseMetadata
 }
 
+type DeleteQueueResponse struct {
+	ResponseMetadata
+}
+
 type ResponseMetadata struct {
 	RequestId string
 	BoxUsage  float64
@@ -102,6 +106,14 @@ func (s *SQS) ListQueues(QueueNamePrefix string) (resp *ListQueuesResponse, err 
 	return
 }
 
+func (q *Queue) Delete() (resp *DeleteQueueResponse, err os.Error) {
+	resp = &DeleteQueueResponse{}
+	params := makeParams("DeleteQueue")
+
+	err = q.SQS.query(q.Url, params, resp)
+	return
+}
+
 func (s *SQS) query(queueUrl string, params map[string]string, resp interface{}) os.Error {
 	params["Timestamp"] = time.UTC().Format(time.RFC3339)
 	var url_ *url.URL
@@ -109,7 +121,7 @@ func (s *SQS) query(queueUrl string, params map[string]string, resp interface{})
 	var path string
 	if queueUrl != "" {
 		url_, err = url.Parse(queueUrl)
-		path = "/" + queueUrl[len(s.Region.SQSEndpoint):]
+		path = queueUrl[len(s.Region.SQSEndpoint):]
 	} else {
 		url_, err = url.Parse(s.Region.SQSEndpoint)
 		path = "/"
