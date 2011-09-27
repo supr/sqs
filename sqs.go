@@ -61,15 +61,19 @@ type ReceiveMessageResponse struct {
 }
 
 type Message struct {
-	MessageId     string      `xml:"ReceiveMessageResult>Message>MessageId"`
-	MD5OfBody     string      `xml:"ReceiveMessageResult>Message>MD5OfBody"`
-	ReceiptHandle string      `xml:"ReceiveMessageResult>Message>ReceiptHandle"`
-	Attribute     []Attribute `xml:"ReceiveMessageResult>Message>Attribute"`
+	MessageId     string      `xml:"MessageId"`
+	MD5OfBody     string      `xml:"MD5OfBody"`
+	ReceiptHandle string      `xml:"ReceiptHandle"`
+	Attribute     []Attribute `xml:"Attribute"`
 }
 
 type Attribute struct {
 	Name  string `xml:"ReceiveMessageResult>Message>Attribute>Name"`
 	Value string `xml:"ReceiveMessageResult>Message>Attribute>Value"`
+}
+
+type ChangeMessageVisibilityResponse struct {
+	ResponseMetadata
 }
 
 type ResponseMetadata struct {
@@ -154,6 +158,16 @@ func (q *Queue) ReceiveMessage(MaxNumberOfMessages, VisibilityTimeout int) (resp
 	params["AttributeName"] = "All"
 	params["MaxNumberOfMessages"] = strconv.Itoa(MaxNumberOfMessages)
 	params["VisibilityTimeout"] = strconv.Itoa(VisibilityTimeout)
+
+	err = q.SQS.query(q.Url, params, resp)
+	return
+}
+
+func (q *Queue) ChangeMessageVisibility(M *Message, VisibilityTimeout int) (resp *ChangeMessageVisibilityResponse, err os.Error) {
+	resp = &ChangeMessageVisibilityResponse{}
+	params := makeParams("ChangeMessageVisibility")
+	params["VisibilityTimeout"] = strconv.Itoa(VisibilityTimeout)
+	params["ReceiptHandle"] = M.ReceiptHandle
 
 	err = q.SQS.query(q.Url, params, resp)
 	return

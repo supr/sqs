@@ -73,3 +73,11 @@ var TestReceiveMessageXmlOK = `
 </ResponseMetadata>
 </ReceiveMessageResponse>
 `
+
+var TestChangeMessageVisibilityXmlOK = `
+<ChangeMessageVisibilityResponse>
+    <ResponseMetadata>
+            <RequestId>6a7a282a-d013-4a59-aba9-335b0fa48bed</RequestId>
+    </ResponseMetadata>
+</ChangeMessageVisibilityResponse>
+`
