@@ -55,6 +55,23 @@ type SendMessageResponse struct {
 	ResponseMetadata
 }
 
+type ReceiveMessageResponse struct {
+	Messages []Message `xml:"ReceiveMessageResult>Message"`
+	ResponseMetadata
+}
+
+type Message struct {
+	MessageId     string      `xml:"ReceiveMessageResult>Message>MessageId"`
+	MD5OfBody     string      `xml:"ReceiveMessageResult>Message>MD5OfBody"`
+	ReceiptHandle string      `xml:"ReceiveMessageResult>Message>ReceiptHandle"`
+	Attribute     []Attribute `xml:"ReceiveMessageResult>Message>Attribute"`
+}
+
+type Attribute struct {
+	Name  string `xml:"ReceiveMessageResult>Message>Attribute>Name"`
+	Value string `xml:"ReceiveMessageResult>Message>Attribute>Value"`
+}
+
 type ResponseMetadata struct {
 	RequestId string
 	BoxUsage  float64
@@ -125,6 +142,18 @@ func (q *Queue) SendMessage(MessageBody string) (resp *SendMessageResponse, err 
 	params := makeParams("SendMessage")
 
 	params["MessageBody"] = MessageBody
+
+	err = q.SQS.query(q.Url, params, resp)
+	return
+}
+
+func (q *Queue) ReceiveMessage(MaxNumberOfMessages, VisibilityTimeout int) (resp *ReceiveMessageResponse, err os.Error) {
+	resp = &ReceiveMessageResponse{}
+	params := makeParams("ReceiveMessage")
+
+	params["AttributeName"] = "All"
+	params["MaxNumberOfMessages"] = strconv.Itoa(MaxNumberOfMessages)
+	params["VisibilityTimeout"] = strconv.Itoa(VisibilityTimeout)
 
 	err = q.SQS.query(q.Url, params, resp)
 	return
