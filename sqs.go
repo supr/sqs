@@ -49,6 +49,12 @@ type DeleteQueueResponse struct {
 	ResponseMetadata
 }
 
+type SendMessageResponse struct {
+	MD5 string `xml:"SendMessageResult>MD5OfMessageBody"`
+	Id  string `xml:"SendMessageResult>MessageId"`
+	ResponseMetadata
+}
+
 type ResponseMetadata struct {
 	RequestId string
 	BoxUsage  float64
@@ -109,6 +115,16 @@ func (s *SQS) ListQueues(QueueNamePrefix string) (resp *ListQueuesResponse, err 
 func (q *Queue) Delete() (resp *DeleteQueueResponse, err os.Error) {
 	resp = &DeleteQueueResponse{}
 	params := makeParams("DeleteQueue")
+
+	err = q.SQS.query(q.Url, params, resp)
+	return
+}
+
+func (q *Queue) SendMessage(MessageBody string) (resp *SendMessageResponse, err os.Error) {
+	resp = &SendMessageResponse{}
+	params := makeParams("SendMessage")
+
+	params["MessageBody"] = MessageBody
 
 	err = q.SQS.query(q.Url, params, resp)
 	return
