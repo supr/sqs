@@ -120,8 +120,8 @@ func (s *SQS) CreateQueueWithTimeout(queueName string, timeout int) (q *Queue, e
 	return
 }
 
-func (s *SQS) NewQueueFromArn(queueUrl string) (q *Queue) {
-    q = &sqs.Queue{s, queueUrl}
+func (s *SQS) QueueFromArn(queueUrl string) (q *Queue) {
+    q = &Queue{s, queueUrl}
     return
 }
 
