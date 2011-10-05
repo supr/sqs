@@ -120,6 +120,11 @@ func (s *SQS) CreateQueueWithTimeout(queueName string, timeout int) (q *Queue, e
 	return
 }
 
+func (s *SQS) NewQueueFromArn(queueUrl string) (q *Queue) {
+    q = &sqs.Queue{s, queueUrl}
+    return
+}
+
 func (s *SQS) newQueue(queueName string, timeout int) (resp *CreateQueueResponse, err os.Error) {
 	resp = &CreateQueueResponse{}
 	params := makeParams("CreateQueue")
