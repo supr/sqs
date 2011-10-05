@@ -45,6 +45,10 @@ type ListQueuesResponse struct {
 	ResponseMetadata
 }
 
+type DeleteMessageResponse struct {
+	ResponseMetadata
+}
+
 type DeleteQueueResponse struct {
 	ResponseMetadata
 }
@@ -74,6 +78,11 @@ type Attribute struct {
 }
 
 type ChangeMessageVisibilityResponse struct {
+	ResponseMetadata
+}
+
+type GetQueueAttributesResponse struct {
+	Attributes []Attribute `xml:"GetQueueAttributesResult>Attribute"`
 	ResponseMetadata
 }
 
@@ -168,6 +177,24 @@ func (q *Queue) ChangeMessageVisibility(M *Message, VisibilityTimeout int) (resp
 	resp = &ChangeMessageVisibilityResponse{}
 	params := makeParams("ChangeMessageVisibility")
 	params["VisibilityTimeout"] = strconv.Itoa(VisibilityTimeout)
+	params["ReceiptHandle"] = M.ReceiptHandle
+
+	err = q.SQS.query(q.Url, params, resp)
+	return
+}
+
+func (q *Queue) GetQueueAttributes(A string) (resp *GetQueueAttributesResponse, err os.Error) {
+	resp = &GetQueueAttributesResponse{}
+	params := makeParams("GetQueueAttributes")
+	params["AttributeName"] = A
+
+	err = q.SQS.query(q.Url, params, resp)
+	return
+}
+
+func (q *Queue) DeleteMessage(M *Message) (resp *DeleteMessageResponse, err os.Error) {
+	resp = &DeleteMessageResponse{}
+	params := makeParams("DeleteMessage")
 	params["ReceiptHandle"] = M.ReceiptHandle
 
 	err = q.SQS.query(q.Url, params, resp)
